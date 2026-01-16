@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 7: Knowledge Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Helvetica Neue', 'Helvetica', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-light': '#C6B4D9',
+                        'brand-medium': '#9C7F9D',
+                        'brand-dark': '#513873',
+                        'brand-darker': '#413659',
+                        'brand-bg': '#f6f5f8',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', 'Inter', sans-serif;
+            background-color: #f6f5f8;
+        }
+        input[type="radio"]:checked,
+        input[type="checkbox"]:checked {
+            accent-color: #513873; 
+        }
+        input[type="radio"]:focus,
+        input[type="checkbox"]:focus {
+            outline: 2px solid #513873;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-brand-bg min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white shadow-2xl rounded-xl p-6 md:p-8 max-w-2xl w-full" id="quiz-container">
+        
+        <div id="quiz-header">
+            <h1 class="text-2xl md:text-3xl font-bold text-brand-darker mb-2 uppercase tracking-tight">Module 7 Knowledge Check</h1>
+            <p class="text-sm text-gray-600 mb-6" id="question-counter">Question 1 of 3</p>
+        </div>
+
+        <div id="question-area">
+            <h2 class="text-xl font-semibold text-brand-darker mb-5" id="question-text"></h2>
+            
+            <div class="space-y-3" id="options-container">
+                <!-- Options will be injected here -->
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <p id="feedback-text" class="text-center font-semibold text-lg" aria-live="polite"></p>
+        </div>
+
+        <div class="mt-6 space-y-3">
+            <button id="check-btn" class="w-full bg-brand-dark text-white py-3 px-5 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
+                Check Answer
+            </button>
+        </div>
+
+    </div>
+
+    <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden" aria-modal="true" role="dialog">
+        <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full border-t-8 border-brand-dark">
+            <h2 class="text-2xl font-bold text-brand-dark mb-6">Correct! Well done</h2>
+            <button id="next-btn" class="w-full bg-brand-dark text-white py-2.5 px-5 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
+                Next Question
+            </button>
+        </div>
+    </div>
+
+    <div id="completion-screen" class="fixed inset-0 bg-brand-bg flex items-center justify-center p-4 hidden">
+        <div class="bg-white shadow-2xl rounded-xl p-8 md:p-10 max-w-2xl w-full text-center">
+            <h1 class="text-3xl font-bold text-brand-darker mb-4">Quiz Complete!</h1>
+            <p class="text-xl text-gray-700">You have successfully finished the Knowledge Check. Thinking about these signs and support options is an important part of staying safe and healthy.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. DEFINE QUIZ DATA ---
+            const quizData = [
+                // Q1: Multiple Answers (VT Signs)
+                {
+                    question: "Which of these signs might mean you are feeling the impact of other people's trauma? (Select all that apply)",
+                    type: "checkbox", 
+                    options: [
+                        { text: "Replaying someone else's story in your mind", id: "q1_a" },
+                        { text: "Avoiding a coworker because you find them annoying", id: "q1_b" },
+                        { text: "Feeling jumpy or always on edge, even in safe places", id: "q1_c" },
+                        { text: "Finding it hard to sleep", id: "q1_d" }
+                    ],
+                    correct: ["q1_a", "q1_c", "q1_d"]
+                },
+                // Q2: Multiple Answers (EAP)
+                {
+                    question: "Why might you use an Employee Assistance Program (EAP)? (Select all that apply)",
+                    type: "checkbox", 
+                    options: [
+                        { text: "To report a coworker for being annoying", id: "q2_a" },
+                        { text: "To talk to a professional in private", id: "q2_b" },
+                        { text: "You think you need a pay rise because of all the stress", id: "q2_c" },
+                        { text: "To get help with a problem before it gets worse", id: "q2_d" }
+                    ],
+                    correct: ["q2_b", "q2_d"]
+                },
+                // Q3: Single Answer (Proactive Wellbeing)
+                {
+                    question: "Which of these is a good way to look after yourself before stress becomes a problem?",
+                    type: "radio", 
+                    options: [
+                        { text: "Working more hours to stay busy", id: "q3_a" },
+                        { text: "Waiting until you are in a crisis to ask for help", id: "q3_b" },
+                        { text: "Setting a simple routine to switch off after work", id: "q3_c" },
+                        { text: "Keeping your work problems to yourself", id: "q3_d" }
+                    ],
+                    correct: ["q3_c"]
+                }
+            ];
+
+            // --- 2. GET ELEMENT REFERENCES ---
+            const quizContainer = document.getElementById('quiz-container');
+            const questionCounter = document.getElementById('question-counter');
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const checkBtn = document.getElementById('check-btn');
+            const nextBtn = document.getElementById('next-btn'); 
+            const feedbackText = document.getElementById('feedback-text');
+            const correctModal = document.getElementById('correct-modal');
+            const completionScreen = document.getElementById('completion-screen');
+
+            // --- 3. STATE VARIABLES ---
+            let currentQuestionIndex = 0;
+
+            // --- 4. FUNCTIONS ---
+
+            function loadQuestion(index) {
+                const question = quizData[index];
+                questionCounter.textContent = `Question ${index + 1} of ${quizData.length}`;
+                questionText.textContent = question.question;
+                optionsContainer.innerHTML = '';
+                feedbackText.textContent = '';
+                feedbackText.className = 'text-center font-semibold text-lg'; 
+
+                question.options.forEach(option => {
+                    const optionId = option.id;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'border border-gray-200 rounded-lg transition-all hover:bg-brand-light/20';
+                    const label = document.createElement('label');
+                    label.htmlFor = optionId;
+                    label.className = 'flex items-center p-3 cursor-pointer w-full';
+                    label.innerHTML = `<input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="mr-3 flex-shrink-0">
+                                       <span class="flex-1 text-brand-darker">${option.text}</span>`;
+                    wrapper.appendChild(label);
+                    optionsContainer.appendChild(wrapper);
+                });
+                checkBtn.classList.remove('hidden');
+            }
+
+            function checkAnswer() {
+                const question = quizData[currentQuestionIndex];
+                const selectedInputs = optionsContainer.querySelectorAll('input:checked');
+                
+                if (selectedInputs.length === 0) {
+                     feedbackText.textContent = "Please select an answer.";
+                     feedbackText.classList.add('text-red-600');
+                     return;
+                }
+
+                let selectedAnswers = Array.from(selectedInputs).map(i => i.value);
+                const isCorrect = selectedAnswers.length === question.correct.length && 
+                                  selectedAnswers.every(val => question.correct.includes(val));
+
+                if (isCorrect) {
+                    feedbackText.textContent = '';
+                    correctModal.classList.remove('hidden');
+                    checkBtn.classList.add('hidden');
+                    if (currentQuestionIndex === quizData.length - 1) {
+                        nextBtn.textContent = "Finish Quiz";
+                    }
+                } else {
+                    feedbackText.textContent = "Not quite. Have another look at the options.";
+                    feedbackText.className = 'text-center font-semibold text-lg text-red-600';
+                }
+            }
+
+            function nextQuestion() {
+                correctModal.classList.add('hidden');
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion(currentQuestionIndex);
+                } else {
+                    quizContainer.classList.add('hidden');
+                    completionScreen.classList.remove('hidden');
+                }
+            }
+
+            // --- 5. INITIALISE & EVENT LISTENERS ---
+            loadQuestion(currentQuestionIndex);
+            checkBtn.addEventListener('click', checkAnswer);
+            nextBtn.addEventListener('click', nextQuestion);
+        });
+    </script>
+</body>
+</html>
