@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Module 7: Knowledge Check</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Configure Brand Colors for Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -33,39 +36,54 @@
             font-family: 'Helvetica Neue', 'Helvetica', 'Inter', sans-serif;
             background-color: #f6f5f8;
         }
+        /* Style radio buttons and checkboxes with the brand color */
         input[type="radio"]:checked,
         input[type="checkbox"]:checked {
             accent-color: #513873; 
         }
+        /* Custom focus rings to use brand color */
         input[type="radio"]:focus,
         input[type="checkbox"]:focus {
             outline: 2px solid #513873;
             outline-offset: 2px;
         }
+        .option-wrapper {
+            transition: all 0.2s ease;
+        }
+        .option-wrapper:hover {
+            border-color: #9C7F9D;
+            background-color: rgba(198, 180, 217, 0.1);
+        }
     </style>
 </head>
 <body class="bg-brand-bg min-h-screen flex items-center justify-center p-4">
 
+    <!-- Quiz Card Container -->
     <div class="bg-white shadow-2xl rounded-xl p-6 md:p-8 max-w-2xl w-full" id="quiz-container">
         
+        <!-- Quiz Header -->
         <div id="quiz-header">
             <h1 class="text-2xl md:text-3xl font-bold text-brand-darker mb-2 uppercase tracking-tight">Module 7 Knowledge Check</h1>
             <p class="text-sm text-gray-600 mb-6" id="question-counter">Question 1 of 3</p>
         </div>
 
+        <!-- Question Area -->
         <div id="question-area">
             <h2 class="text-xl font-semibold text-brand-darker mb-5" id="question-text"></h2>
             
+            <!-- Options Area -->
             <div class="space-y-3" id="options-container">
                 <!-- Options will be injected here -->
             </div>
         </div>
 
-        <div class="mt-6">
+        <!-- Feedback Area -->
+        <div class="mt-6 min-h-[1.75rem]">
             <p id="feedback-text" class="text-center font-semibold text-lg" aria-live="polite"></p>
         </div>
 
-        <div class="mt-6 space-y-3">
+        <!-- Button Controls -->
+        <div class="mt-4 space-y-3">
             <button id="check-btn" class="w-full bg-brand-dark text-white py-3 px-5 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
                 Check Answer
             </button>
@@ -73,8 +91,14 @@
 
     </div>
 
-    <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden" aria-modal="true" role="dialog">
-        <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full border-t-8 border-brand-dark">
+    <!-- Correct Answer Modal (Pop-out) -->
+    <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50" aria-modal="true" role="dialog">
+        <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full border-t-8 border-brand-dark transform transition-all">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
             <h2 class="text-2xl font-bold text-brand-dark mb-6">Correct! Well done</h2>
             <button id="next-btn" class="w-full bg-brand-dark text-white py-2.5 px-5 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
                 Next Question
@@ -82,19 +106,27 @@
         </div>
     </div>
 
+    <!-- Completion Screen -->
     <div id="completion-screen" class="fixed inset-0 bg-brand-bg flex items-center justify-center p-4 hidden">
         <div class="bg-white shadow-2xl rounded-xl p-8 md:p-10 max-w-2xl w-full text-center">
+            <div class="flex justify-center mb-6">
+                <div class="bg-brand-light/30 p-5 rounded-full">
+                    <svg class="w-12 h-12 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
             <h1 class="text-3xl font-bold text-brand-darker mb-4">Quiz Complete!</h1>
             <p class="text-xl text-gray-700">You have successfully finished the Knowledge Check. Thinking about these signs and support options is an important part of staying safe and healthy.</p>
         </div>
     </div>
 
+    <!-- JavaScript Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. DEFINE QUIZ DATA ---
             const quizData = [
-                // Q1: Multiple Answers (VT Signs)
                 {
                     question: "Which of these signs might mean you are feeling the impact of other people's trauma? (Select all that apply)",
                     type: "checkbox", 
@@ -106,7 +138,6 @@
                     ],
                     correct: ["q1_a", "q1_c", "q1_d"]
                 },
-                // Q2: Multiple Answers (EAP)
                 {
                     question: "Why might you use an Employee Assistance Program (EAP)? (Select all that apply)",
                     type: "checkbox", 
@@ -118,7 +149,6 @@
                     ],
                     correct: ["q2_b", "q2_d"]
                 },
-                // Q3: Single Answer (Proactive Wellbeing)
                 {
                     question: "Which of these is a good way to look after yourself before stress becomes a problem?",
                     type: "radio", 
@@ -150,12 +180,17 @@
 
             function loadQuestion(index) {
                 const question = quizData[index];
+                
+                // Update header text
                 questionCounter.textContent = `Question ${index + 1} of ${quizData.length}`;
                 questionText.textContent = question.question;
+                
+                // Clear old options and feedback
                 optionsContainer.innerHTML = '';
                 feedbackText.textContent = '';
                 feedbackText.className = 'text-center font-semibold text-lg'; 
 
+                // Create and append new options
                 question.options.forEach(option => {
                     const optionId = option.id;
                     const wrapper = document.createElement('div');
@@ -163,11 +198,13 @@
                     const label = document.createElement('label');
                     label.htmlFor = optionId;
                     label.className = 'flex items-center p-3 cursor-pointer w-full';
-                    label.innerHTML = `<input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="mr-3 flex-shrink-0">
-                                       <span class="flex-1 text-brand-darker">${option.text}</span>`;
+                    label.innerHTML = `<input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="w-5 h-5 mr-3 flex-shrink-0 accent-brand-dark">
+                                       <span class="flex-1 text-brand-darker font-medium">${option.text}</span>`;
                     wrapper.appendChild(label);
                     optionsContainer.appendChild(wrapper);
                 });
+
+                // Show check button
                 checkBtn.classList.remove('hidden');
             }
 
@@ -177,13 +214,13 @@
                 
                 if (selectedInputs.length === 0) {
                      feedbackText.textContent = "Please select an answer.";
-                     feedbackText.classList.add('text-red-600');
+                     feedbackText.className = 'text-center font-semibold text-lg text-red-600';
                      return;
                 }
 
-                let selectedAnswers = Array.from(selectedInputs).map(i => i.value);
-                const isCorrect = selectedAnswers.length === question.correct.length && 
-                                  selectedAnswers.every(val => question.correct.includes(val));
+                let selectedAnswers = Array.from(selectedInputs).map(i => i.value).sort();
+                const correctAnswers = [...question.correct].sort();
+                const isCorrect = JSON.stringify(selectedAnswers) === JSON.stringify(correctAnswers);
 
                 if (isCorrect) {
                     feedbackText.textContent = '';
@@ -191,6 +228,8 @@
                     checkBtn.classList.add('hidden');
                     if (currentQuestionIndex === quizData.length - 1) {
                         nextBtn.textContent = "Finish Quiz";
+                    } else {
+                        nextBtn.textContent = "Next Question";
                     }
                 } else {
                     feedbackText.textContent = "Not quite. Have another look at the options.";
